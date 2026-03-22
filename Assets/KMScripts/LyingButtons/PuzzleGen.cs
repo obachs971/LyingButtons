@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PuzzleGen 
 {
-    private int NUM_HONEST_RETRIES = 1000;
-    private int NUM_LIAR_RETRIES = 1000;
+    //static Dictionary<string, List<List<int>>> storedPermutations = new Dictionary<string, List<List<int>>>();
+    private int NUM_TOTAL_RETRIES = 1000;
 
     public Button[] generatePuzzle(Button[] buttons, List<int> possNumLiars, int numColors)
     {
@@ -28,6 +29,7 @@ public class PuzzleGen
         foreach (ClueObj clue in allFalseClues)
             Debug.LogFormat("{0}", clue.toString());
         */
+        /*
         List<List<ClueObj>> trueClues = new List<List<ClueObj>>(), falseClues = new List<List<ClueObj>>();
         for(int i = 0; i < buttons.Length; i++)
         {
@@ -44,7 +46,8 @@ public class PuzzleGen
                 falseClues[falseClues.Count - 1].Shuffle();
             }
         }
-        return getValidPuzzle(buttons, clueTester, possNumLiars, trueClues, falseClues);
+        */
+        return GetValidPuzzle(buttons, clueTester, possNumLiars, allTrueClues, allFalseClues);
     }
 	private List<ClueObj> getAllPossibleClueIds(Button[] buttons, List<int> possNumLiars, int numColors)
     {
@@ -107,12 +110,12 @@ public class PuzzleGen
         }
 
         foreach(int i in possNumLiars)
-            clues.Add(new CEqual("There is exactly " + i + " liars", "GD", "LLL", i));
+            clues.Add(new CEqual(string.Format("There {1} exactly {0} liar{2}", i, i == 1 ? "is" : "are", i == 1 ? "" : "s"), "GD", "LLL", i));
         
         for(int i = 0; i <= maxLiars; i++)
         {
             if(i != 1)
-                clues.Add(new CEqual("There is exactly " + i + " liars that are orthogonally adjacent to one another", "GD", "AJL", i));
+                clues.Add(new CEqual("There are exactly " + i + " liars that are orthogonally adjacent to one another", "GD", "AJL", i));
         }
         
         locIds = new string[] { "A1", "B1", "C1", "A2", "B2", "C2", "A3", "B3", "C3" };
@@ -212,375 +215,51 @@ public class PuzzleGen
         
         return clues;
     }
-    private Button[] getValidPuzzle(Button[] buttons, ClueTester clueTester, List<int> possNumLiars, List<List<ClueObj>> trueClues, List<List<ClueObj>> falseClues)
+    private Button[] GetValidPuzzle(Button[] buttons, ClueTester clueTester, List<int> possNumLiars, List<ClueObj> trueClues, List<ClueObj> falseClues)
     {
-        for(int z = 0; z < NUM_HONEST_RETRIES; z++)
+        for(int z = 0; z < NUM_TOTAL_RETRIES; z++)
         {
-            List<ClueObj> chosen = new List<ClueObj>();
-            foreach(List<ClueObj> trueClueList in trueClues)
-                chosen.Add(trueClueList.Shuffle()[0]);
-            if (canSolve(copyColors(buttons), chosen, clueTester, possNumLiars))
-            {
-                List<ClueObj> FC = getFalseClues(buttons, chosen, falseClues, clueTester, possNumLiars);
-                if (FC != null)
-                {
-                    int n1 = 0, n2 = 0;
-                    for (int i = 0; i < buttons.Length; i++)
-                    {
-                        if (buttons[i].isTruth)
-                        {
-                            buttons[i].clue = chosen[n1];
-                            n1++;
-                        }
-                        else
-                        {
-                            buttons[i].clue = FC[n2];
-                            n2++;
-                        }
-                    }
-                    return buttons;
-                }
-            }
+            for (var x = 0; x < buttons.Length; x++)
+                buttons[x].clue = buttons[x].isTruth ? trueClues.PickRandom() : falseClues.PickRandom();
+            if (CanSolve(buttons: buttons, clueTester: clueTester, possNumLiars: possNumLiars))
+                return buttons;
         }
         return null;
     }
-    private bool canSolve(Button[] buttons, List<ClueObj> trueClues, ClueTester clueTester, List<int> possNumLiars)
+    private bool CanSolve(Button[] buttons, ClueTester clueTester, List<int> possNumLiars)
     {
         int sum = 0;
-        //1 Liar
-        if(possNumLiars.Contains(1))
+        var cntButtons = buttons.Length;
+        var possibleCombinations = possNumLiars.SelectMany(amount => GeneratePermutations(cntButtons, amount)).ToList();
+        for (var x = 0; x < possibleCombinations.Count && sum < 2; x++)
         {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                bool flag = true;
-                foreach (ClueObj clue in trueClues)
-                {
-                    if (!clueTester.testClue(clue, buttons))
-                    {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag)
-                {
-                    sum++;
-                    if (sum > 1)
-                        return false;
-                }
-                buttons[i].isTruth = true;
-            }
-        }
-        //2 Liars
-        if (possNumLiars.Contains(2))
-        {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                for (int j = i + 1; j < buttons.Length; j++)
-                {
-                    buttons[j].isTruth = false;
-                    bool flag = true;
-                    foreach (ClueObj clue in trueClues)
-                    {
-                        if (!clueTester.testClue(clue, buttons))
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag)
-                    {
-                        sum++;
-                        if (sum > 1)
-                            return false;
-                    }
-                    buttons[j].isTruth = true;
-                }
-                buttons[i].isTruth = true;
-            }
-        }
-        //3 Liars
-        if (possNumLiars.Contains(3))
-        {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                for (int j = i + 1; j < buttons.Length; j++)
-                {
-                    buttons[j].isTruth = false;
-                    for (int k = j + 1; k < buttons.Length; k++)
-                    {
-                        buttons[k].isTruth = false;
-                        bool flag = true;
-                        foreach (ClueObj clue in trueClues)
-                        {
-                            if (!clueTester.testClue(clue, buttons))
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-                        if (flag)
-                        {
-                            sum++;
-                            if (sum > 1)
-                                return false;
-                        }
-                        buttons[k].isTruth = true;
-                    }
-                    buttons[j].isTruth = true;
-                }
-                buttons[i].isTruth = true;
-            }
-        }
-        //4 Liars
-        if (possNumLiars.Contains(4))
-        {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                for (int j = i + 1; j < buttons.Length; j++)
-                {
-                    buttons[j].isTruth = false;
-                    for (int k = j + 1; k < buttons.Length; k++)
-                    {
-                        buttons[k].isTruth = false;
-                        for(int l = k + 1; l < buttons.Length; l++)
-                        {
-                            buttons[l].isTruth = false;
-                            bool flag = true;
-                            foreach (ClueObj clue in trueClues)
-                            {
-                                if (!clueTester.testClue(clue, buttons))
-                                {
-                                    flag = false;
-                                    break;
-                                }
-                            }
-                            if (flag)
-                            {
-                                sum++;
-                                if (sum > 1)
-                                    return false;
-                            }
-                            buttons[l].isTruth = true;
-                        }
-                        buttons[k].isTruth = true;
-                    }
-                    buttons[j].isTruth = true;
-                }
-                buttons[i].isTruth = true;
-            }
+            var curCombination = possibleCombinations[x];
+            var copiedButtons = Copy(buttons);
+            for (var idx = 0; idx < cntButtons; idx++)
+                copiedButtons[idx].isTruth = !curCombination.Contains(idx);
+            if (copiedButtons.All(aButton => clueTester.testClue(aButton.clue, copiedButtons) == aButton.isTruth))
+                sum++;
         }
         return sum == 1;
     }
-    private List<ClueObj> getFalseClues(Button[] buttons, List<ClueObj> trueClues, List<List<ClueObj>> falseClues, ClueTester clueTester, List<int> possNumLiars)
-    {
-        for(int z = 0; z < NUM_LIAR_RETRIES; z++)
-        {
-            List<ClueObj> chosen = new List<ClueObj>();
-            foreach (List<ClueObj> falseClueList in falseClues)
-                chosen.Add(falseClueList.Shuffle()[0]);
-            if (canSolve(buttons, trueClues, chosen, clueTester, possNumLiars))
-                return chosen;
-            
-        }
-        return null;
-    }
-    private bool canSolve(Button[] realButtons, List<ClueObj> trueClues, List<ClueObj> falseClues, ClueTester clueTester, List<int> possNumLiars)
-    {
-        List<ClueObj> clues = new List<ClueObj>();
-        int index1 = 0, index2 = 0;
-        for(int i = 0; i < realButtons.Length; i++)
-        {
-            if (realButtons[i].isTruth)
-            {
-                clues.Add(trueClues[index1]);
-                index1++;
-            }
-            else
-            {
-                clues.Add(falseClues[index2]);
-                index2++;
-            }
-        }
-        Button[] buttons = copyColors(realButtons);
-        int sum = 0;
 
-        //1 Liar
-        if (possNumLiars.Contains(1))
+    private static List<List<int>> GeneratePermutations(int itemCount, int itemsPicked = 0)
+    {
+        var output = new List<List<int>> { new List<int>() };
+        for (var curLoopIdx = 0; curLoopIdx < itemsPicked; curLoopIdx++)
         {
-            for (int i = 0; i < buttons.Length; i++)
+            var nextOutput = new List<List<int>>();
+            foreach (var item in output)
             {
-                buttons[i].isTruth = false;
-                bool flag = true;
-                for (int z = 0; z < clues.Count; z++)
-                {
-                    if (buttons[z].isTruth)
-                    {
-                        if (!clueTester.testClue(clues[z], buttons))
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (clueTester.testClue(clues[z], buttons))
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                }
-                if (flag)
-                {
-                    sum++;
-                    if (sum > 1)
-                        return false;
-                }
-                buttons[i].isTruth = true;
+                var idxesAllow = Enumerable.Range(0, itemCount).Where(a => !item.Any() || a > item.Max()).ToArray();
+                foreach (var idxCur in idxesAllow)
+                    nextOutput.Add(item.Concat(new[] { idxCur }).ToList());
             }
+            output = nextOutput;
         }
-
-        //2 Liars
-        if (possNumLiars.Contains(2))
-        {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                for (int j = i + 1; j < buttons.Length; j++)
-                {
-                    buttons[j].isTruth = false;
-                    bool flag = true;
-                    for (int z = 0; z < clues.Count; z++)
-                    {
-                        if (buttons[z].isTruth)
-                        {
-                            if (!clueTester.testClue(clues[z], buttons))
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (clueTester.testClue(clues[z], buttons))
-                            {
-                                flag = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (flag)
-                    {
-                        sum++;
-                        if (sum > 1)
-                            return false;
-                    }
-                    buttons[j].isTruth = true;
-                }
-                buttons[i].isTruth = true;
-            }
-        }
-        //3 Liars
-        if (possNumLiars.Contains(3))
-        {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                for (int j = i + 1; j < buttons.Length; j++)
-                {
-                    buttons[j].isTruth = false;
-                    for (int k = j + 1; k < buttons.Length; k++)
-                    {
-                        buttons[k].isTruth = false;
-                        bool flag = true;
-                        for (int z = 0; z < clues.Count; z++)
-                        {
-                            if (buttons[z].isTruth)
-                            {
-                                if (!clueTester.testClue(clues[z], buttons))
-                                {
-                                    flag = false;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                if (clueTester.testClue(clues[z], buttons))
-                                {
-                                    flag = false;
-                                    break;
-                                }
-                            }
-                        }
-                        if (flag)
-                        {
-                            sum++;
-                            if (sum > 1)
-                                return false;
-                        }
-                        buttons[k].isTruth = true;
-                    }
-                    buttons[j].isTruth = true;
-                }
-                buttons[i].isTruth = true;
-            }
-        }
-        //4 Liars
-        if (possNumLiars.Contains(4))
-        {
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                buttons[i].isTruth = false;
-                for (int j = i + 1; j < buttons.Length; j++)
-                {
-                    buttons[j].isTruth = false;
-                    for (int k = j + 1; k < buttons.Length; k++)
-                    {
-                        buttons[k].isTruth = false;
-                        for(int l = k + 1; l < buttons.Length; l++)
-                        {
-                            buttons[l].isTruth = false;
-                            bool flag = true;
-                            for (int z = 0; z < clues.Count; z++)
-                            {
-                                if (buttons[z].isTruth)
-                                {
-                                    if (!clueTester.testClue(clues[z], buttons))
-                                    {
-                                        flag = false;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    if (clueTester.testClue(clues[z], buttons))
-                                    {
-                                        flag = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (flag)
-                            {
-                                sum++;
-                                if (sum > 1)
-                                    return false;
-                            }
-                            buttons[l].isTruth = true;
-                        }
-                        buttons[k].isTruth = true;
-                    }
-                    buttons[j].isTruth = true;
-                }
-                buttons[i].isTruth = true;
-            }
-        }
-        return sum == 1;
+        return output;
     }
+
     private string getColorCode(ButtonColor color)
     {
         switch(color)
@@ -607,11 +286,11 @@ public class PuzzleGen
         }
         return null;
     }
-    private Button[] copyColors(Button[] buttons)
+    private Button[] Copy(Button[] buttons)
     {
         Button[] copy = new Button[buttons.Length];
         for(int i = 0; i < buttons.Length; i++)
-            copy[i] = new Button(buttons[i].buttonColor, true, buttons[i].coord);
+            copy[i] = new Button(buttons[i].buttonColor, buttons[i].isTruth, buttons[i].coord, buttons[i].clue);
         return copy;
     }
 }
