@@ -287,7 +287,7 @@ public class LyingButtons : MonoBehaviour {
 			yield return null;
             for (var x = 0; x < toggleCmdVal.Length; x += 2)
             {
-				var refButton = allowedBtnPos.IndexOf(a => a == toggleCmdVal[x]);
+				var refButton = allowedBtnPos.IndexOf(a => a == toggleCmdVal[x]) % toggleButtons.Length;
 				var refNoteIdx = refValidNotesOrdered.IndexOf(toggleCmdVal[x + 1]);
 				while (refNoteIdx != toggleIndexes[refButton])
                 {
