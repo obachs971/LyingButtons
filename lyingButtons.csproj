@@ -310,40 +310,40 @@
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
  <Reference Include="0Harmony">
- <HintPath>E:/Sean Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/0Harmony.dll</HintPath>
+ <HintPath>E:/Sean's Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/0Harmony.dll</HintPath>
  </Reference>
  <Reference Include="DotNetZip">
- <HintPath>E:/Sean Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/DotNetZip.dll</HintPath>
+ <HintPath>E:/Sean's Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/DotNetZip.dll</HintPath>
  </Reference>
  <Reference Include="KtaneAssemblyExporter">
- <HintPath>E:/Sean Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/KtaneAssemblyExporter.dll</HintPath>
+ <HintPath>E:/Sean's Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/KtaneAssemblyExporter.dll</HintPath>
  </Reference>
  <Reference Include="KtaneModkitUtils">
- <HintPath>E:/Sean Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/KtaneModkitUtils.dll</HintPath>
+ <HintPath>E:/Sean's Files/KTANE MODS/LyingButtons/Assets/Editor/Plugins/Managed/KtaneModkitUtils.dll</HintPath>
  </Reference>
  <Reference Include="KMFramework">
- <HintPath>E:/Sean Files/KTANE MODS/LyingButtons/Assets/Plugins/Managed/KMFramework.dll</HintPath>
+ <HintPath>E:/Sean's Files/KTANE MODS/LyingButtons/Assets/Plugins/Managed/KMFramework.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>E:/Sean Files/KTANE MODS/LyingButtons/Assets/Plugins/Managed/Newtonsoft.Json.dll</HintPath>
+ <HintPath>E:/Sean's Files/KTANE MODS/LyingButtons/Assets/Plugins/Managed/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Advertisements">
- <HintPath>C:/Users/obachsk/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
+ <HintPath>C:/Users/obach/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Analytics">
- <HintPath>C:/Users/obachsk/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.13/UnityEngine.Analytics.dll</HintPath>
+ <HintPath>C:/Users/obach/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.13/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Analytics">
- <HintPath>C:/Users/obachsk/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.13/Editor/UnityEditor.Analytics.dll</HintPath>
+ <HintPath>C:/Users/obach/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.13/Editor/UnityEditor.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Purchasing">
- <HintPath>C:/Users/obachsk/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@0.0.19/UnityEngine.Purchasing.dll</HintPath>
+ <HintPath>C:/Users/obach/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@0.0.19/UnityEngine.Purchasing.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Purchasing">
- <HintPath>C:/Users/obachsk/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@0.0.19/Editor/UnityEditor.Purchasing.dll</HintPath>
+ <HintPath>C:/Users/obach/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@0.0.19/Editor/UnityEditor.Purchasing.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.StandardEvents">
- <HintPath>C:/Users/obachsk/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
+ <HintPath>C:/Users/obach/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
