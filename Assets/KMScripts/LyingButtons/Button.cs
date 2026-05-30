@@ -14,6 +14,13 @@ public class Button
 		this.isTruth = isTruth;
 		this.coord = coord;
 	}
+	public Button(ButtonColor buttonColor, bool isTruth, string coord, ClueObj clue)
+	{
+		this.buttonColor = buttonColor;
+		this.isTruth = isTruth;
+		this.coord = coord;
+		this.clue = clue;
+	}
 
 	public string toString()
 	{
